@@ -1,8 +1,7 @@
-// As always, nice day. I liked working with some new concepts in Go, like
-// the 'sort' package and a custom sort function. I also liked working with
-// enums in Go. I think they are a nice way to make the code more readable.
-// Otherwise the code is concise and easy to understand. The switch statement
-// in the getPlayType function is also a nice touch.
+// After returning to this part 2 after doing day 11, I was pleasantly surprised
+// of how easy this part was. Just change the worth of the Joker-card to -1 and
+// Add 6 Lines of code to the getPlayType-function.
+// Easy as that.
 package main
 
 import (
@@ -46,11 +45,12 @@ const (
 	HIGH_CARD     PlayType = 0
 )
 
+// Jokers are now the lowest card
 var cards = map[rune]int{
 	'A': 12,
 	'K': 11,
 	'Q': 10,
-	'J': 9,
+	'J': -1,
 	'T': 8,
 	'9': 7,
 	'8': 6,
@@ -66,9 +66,19 @@ var cards = map[rune]int{
 func getPlayType(hand string) PlayType {
 	cardMap := map[rune]int{}
 
-	// Count the amount of each card
+	// Count the amount of cards of the same type
 	for _, card := range hand {
 		cardMap[card] += 1
+	}
+
+	// Jokers are wild
+	// Remove them from the map
+	js := cardMap['J']
+	delete(cardMap, 'J')
+
+	// If there are no cards left, it's a five of a kind with jokers
+	if len(cardMap) == 0 {
+		return FIVE_OF_KIND
 	}
 
 	// Find the max amount of cards of the same type
@@ -78,6 +88,8 @@ func getPlayType(hand string) PlayType {
 			maxAmount = amount
 		}
 	}
+	// The Jokers are wild, so add them to the max amount
+	maxAmount += js
 
 	switch maxAmount {
 	case 5:
